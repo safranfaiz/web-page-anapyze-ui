@@ -1,0 +1,20 @@
+<div class="content" role="main">
+
+    <div class="card-container">
+        <div>
+            <h1>Weg Page Analyzing Tool</h1>
+            <input type="text" [(ngModel)]="url" placeholder="Enter URL" />
+            <button (click)="getData()">Click Me</button>
+            <br><br><br>
+            <div *ngIf="response">
+                <div>
+                    <h2>Analyze Repot for <b>{{response.basePath}}</b> </h2>
+                </div>
+                {{response.htmlVersion}}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<router-outlet></router-outlet>
