@@ -283,3 +283,29 @@ svg#clouds {
         visibility: hidden;
     }
 }
+
+.heading-text {
+    font-size: 56px;
+}
+
+.large-textbox {
+    width: 85%;
+    height: 20%;
+}
+
+.version {
+    color: black;
+}
+
+.size {
+    width: 45%;
+}
+
+.card-display {
+    display: ruby;
+}
+
+.cards {
+    height: 100%;
+    width: 100%;
+}

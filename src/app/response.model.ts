@@ -10,6 +10,7 @@ export interface AnalyzeResponse {
     executedUrl: string;
     basePath: string;
     appExecuteTotalTime: number;
+    sortHeading: any
 }
 
 export interface Url {

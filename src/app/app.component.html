@@ -2,19 +2,89 @@
 
     <div class="card-container">
         <div>
-            <h1>Weg Page Analyzing Tool</h1>
-            <input type="text" [(ngModel)]="url" placeholder="Enter URL" />
-            <button (click)="getData()">Click Me</button>
-            <br><br><br>
+            <h1 class="h1 display-1">Web Page Analyzing Tool</h1>
+            <br>
+            <div class="mb-3">
+                <input type="text" class="form-control" [(ngModel)]="url" placeholder="Enter URL" aria-describedby="emailHelp">
+            </div>
+            <button type="submit" class="btn btn-primary" (click)="getData()">Analyze</button>
+
             <div *ngIf="response">
                 <div>
                     <h2>Analyze Repot for <b>{{response.basePath}}</b> </h2>
                 </div>
-                {{response.htmlVersion}}
+                <br>
+                <h3><span class="badge badge-secondary version">HTML Version : </span> {{response.htmlVersion}}</h3>
+                <h3><span class="badge badge-secondary version">Title of Web Page : </span> {{response.title}}</h3>
+                <h3><span class="badge badge-secondary version">Total time of Extraction : </span> {{response.appExecuteTotalTime}}ms</h3>
+                <div *ngIf="!response.hasLogin" class="alert alert-secondary size" role="alert">
+                    <span class="alert-link">There is no Login Form</span>
+                </div>
+
+                <div *ngIf="response.hasLogin" class="alert alert-primary size" role="alert">
+                    <span class="alert-link">There is Login Form</span>
+                </div>
+
+                <div>
+                    <div class="btn btn-primary">Heading Content Details</div>
+                    <div *ngFor="let headingType of sortHead | keyvalue">
+                        <h2>{{ headingType.key | uppercase }} : {{headingType.value.length}}</h2>
+                        <ul>
+                            <li *ngFor="let heading of headingType.value">
+                                {{heading.text}}
+                            </li>
+                        </ul>
+                        <hr>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
-
+    <div *ngIf="response" class="card-display">
+        <div *ngFor="let url of response.urls">
+            <div *ngIf="url.status >= 200 && url.status <= 399" class="card text-white bg-success mb-3 cards" style="max-width: 18rem;">
+                <table>
+                    <tr>
+                        <div>Accessibility : {{url.accessible}} | Type : {{url.type}} </div>
+                    </tr>
+                    <tr>
+                        <div>Link : {{url.url | slice:0:25}}</div>
+                    </tr>
+                    <tr>
+                        <div>Status : {{url.status}} | Time : {{url.urlExecutionTime}}ms</div>
+                    </tr>
+                </table>
+            </div>
+            <div *ngIf="url.status >= 400 && url.status <= 499" class="card bg-light mb-3 cards" style="max-width: 18rem;">
+                <table>
+                    <tr>
+                        <div>Accessibility : {{url.accessible}} | Type : {{url.type}} </div>
+                    </tr>
+                    <tr>
+                        <div>Link : {{url.url | slice:0:25}}</div>
+                    </tr>
+                    <tr>
+                        <div>Status : {{url.status}} | Time : {{url.urlExecutionTime}}ms</div>
+                    </tr>
+                </table>
+            </div>
+            <div *ngIf="url.status >= 500" class="card text-white bg-danger mb-3" style="max-width: 18rem;">
+                <table>
+                    <tr>
+                        <div>Accessibility : {{url.accessible}} | Type : {{url.type}} </div>
+                    </tr>
+                    <tr>
+                        <div>Link : {{url.url | slice:0:25}}</div>
+                    </tr>
+                    <tr>
+                        <div>Status : {{url.status}} | Time : {{url.urlExecutionTime}}ms</div>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <router-outlet></router-outlet>

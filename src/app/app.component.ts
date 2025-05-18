@@ -9,17 +9,20 @@ import { AnalyzeResponse } from './response.model';
 })
 export class AppComponent {
 
-  url: string = '';
+  url: string = 'https://safranfaiz.github.io/shariputhra_maha_vidyalaya_ahangama/';
   response: AnalyzeResponse;
+  sortHead: {}
   constructor(private http: HttpClient) {}
 
   getData() {
     console.log("User entered url: ", this.url)
+    this.response = null
     if (this.isValidUrl(this.url)) { 
       this.http.get<AnalyzeResponse>(`http://localhost:8888/api/v1/analyze?url=${this.url}`)
         .subscribe({
           next: (data) => {
             this.response = data['response'];
+            this.groupByTagAlternative(this.response.headings);
           },
           error: (err) => {
             console.error('API Error:', err);
@@ -35,6 +38,20 @@ export class AppComponent {
     } catch (_) {
       return false;
     }
+  }
+
+  groupByTagAlternative(arr) {
+    const result = {};
+    for (const item of arr) {
+      if (result[item.tag]) {
+        result[item.tag].push(item);
+      } else {
+        result[item.tag] = [item];
+      }
+    }
+    
+    this.sortHead = result;
+    console.log("sortHead >>>>> ",this.sortHead)
   }
 
 }
