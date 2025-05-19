@@ -9,7 +9,7 @@ import { AnalyzeResponse } from './response.model';
 })
 export class AppComponent {
 
-  url: string = 'https://safranfaiz.github.io/shariputhra_maha_vidyalaya_ahangama/';
+  url: string = '';
   response: AnalyzeResponse;
   sortHead: {}
   constructor(private http: HttpClient) {}
