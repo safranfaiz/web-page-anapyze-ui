@@ -8,8 +8,11 @@
             <div class="mb-3">
                 <input type="text" class="form-control" [(ngModel)]="url" placeholder="Enter URL" aria-describedby="emailHelp">
             </div>
-            <button type="submit" class="btn btn-primary" [disabled]="loading" (click)="getData()">
+            <button type="submit" class="btn btn-primary" [disabled]="loading" (click)="getData()" style="margin-right: 1;margin-right: 20px;">
                 {{ loading ? 'Analyzing...' : 'Analyze' }}
+            </button>
+            <button type="submit" class="btn btn-primary" (click)="clear()">
+                Clear
             </button>
 
             <!-- Show error -->

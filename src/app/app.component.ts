@@ -63,6 +63,13 @@ export class AppComponent {
     }
   }
 
+  clear() {
+    this.url = '';
+    this.response = null;
+    this.errorRes = null;
+    this.loading = false;
+  }
+
   isValidUrl(url: string): boolean {
     try {
       const parsed = new URL(url);
