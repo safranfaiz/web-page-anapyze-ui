@@ -25,3 +25,8 @@ export interface Heading {
     tag: string;
     text: string
 }
+
+export interface ErrorRes {
+    status: number;
+    message: string;
+  }

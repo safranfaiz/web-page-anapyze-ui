@@ -4,87 +4,181 @@
         <div>
             <h1 class="h1 display-1">Web Page Analyzing Tool</h1>
             <br>
+
             <div class="mb-3">
                 <input type="text" class="form-control" [(ngModel)]="url" placeholder="Enter URL" aria-describedby="emailHelp">
             </div>
-            <button type="submit" class="btn btn-primary" (click)="getData()">Analyze</button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading" (click)="getData()">
+                {{ loading ? 'Analyzing...' : 'Analyze' }}
+            </button>
+
+            <!-- Show error -->
+            <div *ngIf="error && errorRes" class="alert alert-danger mt-3" role="alert">
+                <strong>Error {{ errorRes.status }}:</strong> {{ errorRes.message }}
+            </div>
 
             <div *ngIf="response">
-                <div>
-                    <h2>Analyze Repot for <b>{{response.basePath}}</b> </h2>
-                </div>
+                <h4>Analyze Report for <b>{{response.basePath}}</b></h4>
                 <br>
-                <h3><span class="badge badge-secondary version">HTML Version : </span> {{response.htmlVersion}}</h3>
-                <h3><span class="badge badge-secondary version">Title of Web Page : </span> {{response.title}}</h3>
-                <h3><span class="badge badge-secondary version">Total time of Extraction : </span> {{response.appExecuteTotalTime}}ms</h3>
-                <div *ngIf="!response.hasLogin" class="alert alert-secondary size" role="alert">
-                    <span class="alert-link">There is no Login Form</span>
-                </div>
 
-                <div *ngIf="response.hasLogin" class="alert alert-primary size" role="alert">
-                    <span class="alert-link">There is Login Form</span>
-                </div>
+                <!-- Summary Info Table -->
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <th>HTML Version</th>
+                            <td>{{response.htmlVersion}}</td>
+                        </tr>
+                        <tr>
+                            <th>Title of Web Page</th>
+                            <td>{{response.title}}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Time of Extraction</th>
+                            <td>{{response.appExecuteTotalTime}} ms</td>
+                        </tr>
+                        <tr>
+                            <th>Login Form</th>
+                            <td>
+                                <span *ngIf="response.hasLogin" class="text-success">✔ Present</span>
+                                <span *ngIf="!response.hasLogin" class="text-danger">✘ Not Present</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                <div>
-                    <div class="btn btn-primary">Heading Content Details</div>
-                    <div *ngFor="let headingType of sortHead | keyvalue">
-                        <h2>{{ headingType.key | uppercase }} : {{headingType.value.length}}</h2>
-                        <ul>
-                            <li *ngFor="let heading of headingType.value">
-                                {{heading.text}}
+                <!-- Heading Content Details -->
+                <h4 class="mt-4">Heading Content Details</h4>
+                <table class="table table-hover table-sm">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Heading Tag</th>
+                            <th>Count</th>
+                            <th>Texts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let headingType of sortHead | keyvalue">
+                            <td>{{ headingType.key.toUpperCase() }}</td>
+                            <td>{{ headingType.value.length }}</td>
+                            <td>
+                                <ul class="mb-0">
+                                    <li *ngFor="let heading of headingType.value">{{ heading.text }}</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <div *ngIf="response && response.urls?.length > 0">
+        <h4 class="mt-4">🔍 Link Accessibility Summary</h4>
+
+        <div *ngIf="response?.urls?.length > 0" class="my-4">
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between bg-primary text-white">
+                    <span>Total Links</span> <strong>{{ linkSummary.total }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between bg-success text-white">
+                    <span>Accessible Links</span> <strong>{{ linkSummary.accessible }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between bg-danger text-white">
+                    <span>Inaccessible Links</span> <strong>{{ linkSummary.inaccessible }}</strong>
+                </li>
+
+                <!-- Internal Links Collapsible -->
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>Internal Links</span>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#internalDetails">
+                            Details
+                        </button>
+                    </div>
+                    <div class="collapse mt-2" id="internalDetails">
+                        <ul class="list-group mt-2">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>✅ Accessible</span> <strong>{{ linkSummary.internalAccessible }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>❌ Inaccessible</span> <strong>{{ linkSummary.internalInaccessible }}</strong>
                             </li>
                         </ul>
-                        <hr>
+                    </div>
+                </li>
+
+                <!-- External Links Collapsible -->
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>External Links</span>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#externalDetails">
+                            Details
+                        </button>
+                    </div>
+                    <div class="collapse mt-2" id="externalDetails">
+                        <ul class="list-group mt-2">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>✅ Accessible</span> <strong>{{ linkSummary.externalAccessible }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>❌ Inaccessible</span> <strong>{{ linkSummary.externalInaccessible }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🔒 Fixed-width container centered on page -->
+        <div class="d-flex justify-content-center">
+            <div id="linkDetailsAccordion" class="accordion my-4" style="width: 1000px; max-width: 100%;">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingLinks">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLinks" aria-expanded="false" aria-controls="collapseLinks">
+                            🔗 Detailed Link Table View
+                        </button>
+                    </h2>
+                    <div id="collapseLinks" class="accordion-collapse collapse" aria-labelledby="headingLinks" data-bs-parent="#linkDetailsAccordion">
+                        <div class="accordion-body">
+
+                            <!-- 📦 Scrollable table container with fixed dimensions -->
+                            <div style="max-height: 400px; overflow: auto;">
+                                <table class="table table-bordered table-hover table-sm" style="min-width: 800px; table-layout: fixed;">
+                                    <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                                        <tr>
+                                            <th style="width: 5%;">#</th>
+                                            <th style="width: 40%;">URL</th>
+                                            <th style="width: 15%;">Type</th>
+                                            <th style="width: 10%;">Status</th>
+                                            <th style="width: 15%;">Accessible</th>
+                                            <th style="width: 15%;">Execution Time (ms)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let url of response.urls; let i = index" [ngClass]="{
+                    'table-success': url.status >= 200 && url.status <= 399,
+                    'table-warning': url.status >= 400 && url.status <= 499,
+                    'table-danger': url.status >= 500
+                  }">
+                                            <td>{{ i + 1 }}</td>
+                                            <td title="{{ url.url }}">{{ url.url | slice:0:50 }}{{ url.url.length > 50 ? '...' : '' }}</td>
+                                            <td>{{ url.type }}</td>
+                                            <td>{{ url.status }}</td>
+                                            <td>{{ url.accessible ? 'Yes' : 'No' }}</td>
+                                            <td>{{ url.urlExecutionTime }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
+
     </div>
-    <div *ngIf="response" class="card-display">
-        <div *ngFor="let url of response.urls">
-            <div *ngIf="url.status >= 200 && url.status <= 399" class="card text-white bg-success mb-3 cards" style="max-width: 18rem;">
-                <table>
-                    <tr>
-                        <div>Accessibility : {{url.accessible}} | Type : {{url.type}} </div>
-                    </tr>
-                    <tr>
-                        <div>Link : {{url.url | slice:0:25}}</div>
-                    </tr>
-                    <tr>
-                        <div>Status : {{url.status}} | Time : {{url.urlExecutionTime}}ms</div>
-                    </tr>
-                </table>
-            </div>
-            <div *ngIf="url.status >= 400 && url.status <= 499" class="card bg-light mb-3 cards" style="max-width: 18rem;">
-                <table>
-                    <tr>
-                        <div>Accessibility : {{url.accessible}} | Type : {{url.type}} </div>
-                    </tr>
-                    <tr>
-                        <div>Link : {{url.url | slice:0:25}}</div>
-                    </tr>
-                    <tr>
-                        <div>Status : {{url.status}} | Time : {{url.urlExecutionTime}}ms</div>
-                    </tr>
-                </table>
-            </div>
-            <div *ngIf="url.status >= 500" class="card text-white bg-danger mb-3" style="max-width: 18rem;">
-                <table>
-                    <tr>
-                        <div>Accessibility : {{url.accessible}} | Type : {{url.type}} </div>
-                    </tr>
-                    <tr>
-                        <div>Link : {{url.url | slice:0:25}}</div>
-                    </tr>
-                    <tr>
-                        <div>Status : {{url.status}} | Time : {{url.urlExecutionTime}}ms</div>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <router-outlet></router-outlet>
